@@ -1,10 +1,23 @@
+const removeActive = () =>{
+  const actCats = document.getElementsByClassName("active");
+  console.log(actCats);
+  for(let actCat of actCats){
+    actCat.classList.remove("active");
+  }
+}
+
 const loadCategories = () => {
     fetch('https://openapi.programming-hero.com/api/phero-tube/categories').then(res => res.json()).then(data => displayCategories(data.categories));
 }
 
 const loadCategoryVideos = (id) => {
   const url = `https://openapi.programming-hero.com/api/phero-tube/category/${id}`
-  fetch(url).then(res =>res.json()).then(data=> displayVideos(data.category));
+  fetch(url).then(res =>res.json()).then(data=> {
+    const catBtn = document.getElementById(`btn-${id}`);
+    removeActive();
+    catBtn.classList.add("active");
+    displayVideos(data.category);
+  });
 }
 
 const displayCategories = (categories) => {
@@ -12,14 +25,19 @@ const displayCategories = (categories) => {
     for(let cat of categories) {
         const categoryDiv = document.createElement("div");
         categoryDiv.innerHTML = `
-        <button onclick="loadCategoryVideos(${cat.category_id})" class="btn btn-sm hover:bg-[#FF1F3D] hover:text-white">${cat.category}</button>
+        <button id="btn-${cat.category_id}" onclick="loadCategoryVideos(${cat.category_id})" class="btn btn-sm">${cat.category}</button>
         `;
         categoriesContainer.appendChild(categoryDiv);
     }
 }
 
 const loadVideos = () => {
-    fetch('https://openapi.programming-hero.com/api/phero-tube/videos').then(res => res.json()).then(data => displayVideos(data.videos));
+    fetch('https://openapi.programming-hero.com/api/phero-tube/videos').then(res => res.json()).then(data => {
+      const allCat = document.getElementById("btn-all");
+      removeActive();
+      allCat.classList.add("active");
+      displayVideos(data.videos)
+    });
 } 
 function displayVideos(videos) {
     const videoContainer = document.getElementById("video-container");
@@ -34,7 +52,6 @@ function displayVideos(videos) {
       return;
     }
     videos.forEach(video => {
-        console.log(video);
         const videoCard = document.createElement("div");
         videoCard.innerHTML = `
          <div class="card rounded-lg overflow-hidden">
